@@ -22,7 +22,7 @@ namespace APIFull
         }
         public static void Main(string[] args)
         {
-           // var db = documentClient.GetDatabase("log");
+            var db = documentClient.GetDatabase("log");
 
             Log.Logger = new LoggerConfiguration()
                   .MinimumLevel.Debug()
@@ -46,6 +46,7 @@ namespace APIFull
                                       AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv6,
 
                                   })
+                                  .WriteTo.MongoDB(db, collectionName: "logFull")
                   )
                   .CreateLogger();
             try

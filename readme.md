@@ -8,7 +8,7 @@ Projeto para testar e comparar a implementação de duas soluções de log do .n
 - visualStudio Profiler
 - Serilog
 - Nlog
-- MongoDB
+- MongoDB 
 - Elaisticsearch
 - Docker
 
@@ -16,9 +16,9 @@ Projeto para testar e comparar a implementação de duas soluções de log do .n
 
 Verificar qual dos pacotes é mais fácil de configurar e o impacto referente a performance nos requests
 
-## Referências
+### Referências
 
--[busitec blog](https://blog.busitec.de/fachliches-und-technisches-logging-mit-serilog/)
--[Nlog](https://nlog-project.org/)
--[Serilog](https://serilog.net/)
--[Sample CSV DATA](https://support.spatialkey.com/spatialkey-sample-csv-data/)
+[-busitec blog](https://blog.busitec.de/fachliches-und-technisches-logging-mit-serilog/)
+[-Nlog](https://nlog-project.org/)
+[-Serilog](https://serilog.net/)
+[-Sample CSV DATA](https://support.spatialkey.com/spatialkey-sample-csv-data/)

@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using LogSample.Model;
+using LogSample.Model.Interface;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.IO;
-using System.Threading.Tasks;
-using Serilog;
+using Newtonsoft.Json;
 using Serilog.Context;
+using System;
+using System.Threading.Tasks;
 
 namespace APICore.Controllers
 {
@@ -14,30 +16,44 @@ namespace APICore.Controllers
     {
         readonly ILogger<ValuesController> _logger;
         private IHttpContextAccessor _accessor;
-        public ValuesController(ILogger<ValuesController> logger, IHttpContextAccessor accessor)
+        private IUserService _userService;
+
+        public ValuesController(ILogger<ValuesController> logger, IHttpContextAccessor accessor, IUserService userService)
         {
             ///Log.ForContext("AuditLog", true);
             _logger = logger;
             _accessor = accessor;
+            _userService = userService;
         }
         // GET api/values
         [HttpGet]
         public async Task<ActionResult> Get()
         {
-            using (var file = new FileStream("SacramentocrimeJanuary2006.csv", FileMode.Open))
-            {
-                using (var reader = new StreamReader(file))
-                {
-                    
-                    string line;
-                    LogContext.PushProperty("AuditLog", true);
+            //using (var file = new FileStream("SacramentocrimeJanuary2006.csv", FileMode.Open))
+            //{
+            //    using (var reader = new StreamReader(file))
+            //    {                    
+            //        string line;
+            //        LogContext.PushProperty("AuditLog", true);
+            //        while ((line = await reader.ReadLineAsync()) != null)
+            //        {
+            //            _logger.Log(LogLevel.Warning, line);
+            //        }
+            //    }
+            //}
+            var item = _userService.GetUser(Guid.NewGuid());
+            var log = new LogModel();
+            log.User = "Current User";
+            log.OldData = JsonConvert.SerializeObject(item);
 
-                    while ((line = await reader.ReadLineAsync()) != null)
-                    {
-                        _logger.Log(LogLevel.Warning, line);
-                    }
-                }
-            }
+            item.Email = "email2@email2.com";
+            item.lastName = "Silva Sauro";
+
+            _userService.Updateuser(item);
+            log.NewData = JsonConvert.SerializeObject(item);
+
+            LogContext.PushProperty("AuditLog", true);
+            _logger.Log(LogLevel.Warning, JsonConvert.SerializeObject(log));
             //_logger.Log(LogLevel.Information, "");
             return Ok(new string[] { "value1", "value2" });
         }

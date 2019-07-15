@@ -23,20 +23,20 @@ namespace APICore
 
         public static void Main(string[] args)
         {
-          //  var db = documentClient.GetDatabase("log");
+            var db = documentClient.GetDatabase("log");
             
             Log.Logger = new LoggerConfiguration()
                   .MinimumLevel.Debug()
                   .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                   .Enrich.WithProperty("App Name", "API Core")
-                                    .Enrich.FromLogContext()
+                  .Enrich.FromLogContext()
                   .WriteTo.Logger(lc => lc.Filter.ByExcluding(Matching.WithProperty("AuditLog"))
                                   .WriteTo.Console(new ElasticsearchJsonFormatter())
                                    .Enrich.WithThreadName()
 
                                   //.WriteTo.MongoDB(db,collectionName:"apiFull")
                                   .WriteTo.Debug()
-                                  .WriteTo.File(@"d:\log\serilog\logFull.txt", fileSizeLimitBytes: 1_000_000,
+                                  .WriteTo.File(@"d:\log\serilog\logCore.txt", fileSizeLimitBytes: 1_000_000,
                                                                                rollOnFileSizeLimit: true, shared: true,
                                                                                flushToDiskInterval: TimeSpan.FromSeconds(1))
                   )
@@ -47,6 +47,7 @@ namespace APICore
                                       AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv6,
 
                                   })
+                                  .WriteTo.MongoDB(db, collectionName:"logCore")
                   )
                   .CreateLogger();
             try
