@@ -41,15 +41,15 @@ namespace APIFull.Controllers
             //    }
             //}
             var item = _userService.GetUser(Guid.NewGuid());
-            var log = new LogModel();
-            log.User = "Current User";
-            log.OldData = JsonConvert.SerializeObject(item);
+            var log = new LogModel<UserModel>("Current User");
+           
+            log.SetOldData( item.Clone() as UserModel);
 
             item.Email = "email2@email2.com";
             item.lastName = "Silva Sauro";
 
             _userService.Updateuser(item);
-            log.NewData = JsonConvert.SerializeObject(item);
+            log.SetNewData(item);
 
 
             LogContext.PushProperty("AuditLog", true);

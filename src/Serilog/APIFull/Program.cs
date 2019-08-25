@@ -40,7 +40,7 @@ namespace APIFull
                                                                                flushToDiskInterval: TimeSpan.FromSeconds(1))
                   )
                   .WriteTo.Logger(lc => lc.Filter.ByIncludingOnly(Matching.WithProperty("AuditLog"))
-                                  .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("https://search-paulolog-skcdv722cchxumxwmb7qguy5tm.us-east-2.es.amazonaws.com/"))
+                                  .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri("http://localhost:9200"))
                                   {
                                       AutoRegisterTemplate = true,
                                       AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv6,
