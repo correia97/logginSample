@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LogSample.Model
 {
@@ -12,9 +10,10 @@ namespace LogSample.Model
         public DateTime? DateofBirth { get; set; }
         public string Email { get; set; }
 
+
         public virtual object Clone()
         {
-           return this.MemberwiseClone();
+            return this.MemberwiseClone();
         }
     }
 }

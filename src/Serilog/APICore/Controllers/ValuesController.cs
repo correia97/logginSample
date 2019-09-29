@@ -1,4 +1,5 @@
 ﻿using LogSample.Model;
+using LogSample.Model.Enum;
 using LogSample.Model.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,45 +18,42 @@ namespace APICore.Controllers
         readonly ILogger<ValuesController> _logger;
         private IHttpContextAccessor _accessor;
         private IUserService _userService;
+        private readonly IElasticService<UserModel> _eService;
 
-        public ValuesController(ILogger<ValuesController> logger, IHttpContextAccessor accessor, IUserService userService)
+        public ValuesController(ILogger<ValuesController> logger,
+            IHttpContextAccessor accessor,
+            IUserService userService,
+            IElasticService<UserModel> eService)
         {
-            ///Log.ForContext("AuditLog", true);
+
             _logger = logger;
             _accessor = accessor;
             _userService = userService;
+            _eService = eService;
         }
         // GET api/values
         [HttpGet]
         public async Task<ActionResult> Get()
         {
-            //using (var file = new FileStream("SacramentocrimeJanuary2006.csv", FileMode.Open))
-            //{
-            //    using (var reader = new StreamReader(file))
-            //    {                    
-            //        string line;
-            //        LogContext.PushProperty("AuditLog", true);
-            //        while ((line = await reader.ReadLineAsync()) != null)
-            //        {
-            //            _logger.Log(LogLevel.Warning, line);
-            //        }
-            //    }
-            //}
-            var item = _userService.GetUser(Guid.NewGuid());
-            var log = new LogModel<UserModel>("Current User");
 
-            log.SetOldData(item.Clone() as UserModel);
+            var item = _userService.GetUser(Guid.Parse("53ffa492-5e18-4733-97f7-4255a322ef41"));
 
+
+            var logItem = new LogItem<UserModel>("CurrentUserName", ActionType.Update, item.Clone() as UserModel);
             item.Email = "email2@email2.com";
             item.lastName = "Silva Sauro";
 
             _userService.Updateuser(item);
-            log.SetNewData(item);
+            logItem.SetNewData(item);
+
 
             LogContext.PushProperty("AuditLog", true);
-            _logger.Log(LogLevel.Warning, JsonConvert.SerializeObject(log));
-            //_logger.Log(LogLevel.Information, "");
-            return Ok(new string[] { "value1", "value2" });
+
+            await _eService.RegisterOrUpdate(logItem, logItem.ObjectName, logItem.ObjectId);
+            //_logger.Log(LogLevel.Warning, JsonConvert.SerializeObject(log));
+
+
+            return Ok();
         }
 
         // GET api/values/5
@@ -64,13 +62,9 @@ namespace APICore.Controllers
         {
             var ip = _accessor.HttpContext.Connection.RemoteIpAddress.ToString();
             var user = "user2@user.com";
-            _logger.Log(LogLevel.Warning, "get with param {0}, {1}, {3}",id, ip, user);
+            _logger.Log(LogLevel.Warning, "get with param {0}, {1}, {3}", id, ip, user);
             return "value";
         }
-
-
-
-
 
         // POST api/values
         [HttpPost]

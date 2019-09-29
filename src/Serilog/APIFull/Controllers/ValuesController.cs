@@ -1,4 +1,5 @@
 ﻿using LogSample.Model;
+using LogSample.Model.Enum;
 using LogSample.Model.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -41,19 +42,19 @@ namespace APIFull.Controllers
             //    }
             //}
             var item = _userService.GetUser(Guid.NewGuid());
-            var log = new LogModel<UserModel>("Current User");
+         //   var log = new LogModel<UserModel>("Current User", ActionType.Update);
            
-            log.SetOldData( item.Clone() as UserModel);
+           // log.SetOldData( item.Clone() as UserModel);
 
             item.Email = "email2@email2.com";
             item.lastName = "Silva Sauro";
 
             _userService.Updateuser(item);
-            log.SetNewData(item);
+          //  log.SetNewData(item);
 
 
             LogContext.PushProperty("AuditLog", true);
-            _logger.Log(LogLevel.Warning, JsonConvert.SerializeObject(log));
+          //  _logger.Log(LogLevel.Warning, JsonConvert.SerializeObject(log));
             //_logger.Log(LogLevel.Information, "");
             return Ok(new string[] { "value1", "value2" });
         }

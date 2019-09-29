@@ -26,6 +26,7 @@ namespace APICore
             .AddAuthorization()
             .AddJsonFormatters();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddScoped(typeof(IElasticService<>), typeof(ElasticService<>));
             services.AddScoped<IUserService, UserService>();
 
 

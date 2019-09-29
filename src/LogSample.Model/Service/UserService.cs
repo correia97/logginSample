@@ -1,7 +1,5 @@
 ﻿using LogSample.Model.Interface;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LogSample.Model.Service
 {
@@ -14,7 +12,7 @@ namespace LogSample.Model.Service
 
         public void Updateuser(UserModel user)
         {
-           //save
+            //save
         }
     }
 }

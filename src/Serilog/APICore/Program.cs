@@ -24,7 +24,7 @@ namespace APICore
         public static void Main(string[] args)
         {
             var db = documentClient.GetDatabase("log");
-            
+
             Log.Logger = new LoggerConfiguration()
                   .MinimumLevel.Debug()
                   .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
@@ -45,9 +45,11 @@ namespace APICore
                                   {
                                       AutoRegisterTemplate = true,
                                       AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv6,
+                                      //PipelineName = "ApiCoreTestPipeline",
+                                      //TypeName = "ApiCoreTesType"
 
                                   })
-                                  .WriteTo.MongoDB(db, collectionName:"logCore")
+                                  .WriteTo.MongoDB(db, collectionName: "logCore")
                   )
                   .CreateLogger();
             try
@@ -70,6 +72,7 @@ namespace APICore
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
+
              .UseSerilog();
     }
 }
