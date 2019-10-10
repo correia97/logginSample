@@ -2,15 +2,20 @@
 using LogSample.Model.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Nest;
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Net.Http;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using Nest;
+using Polly;
+using System.Net;
+using Polly.Retry;
+using Flurl;
+using Flurl.Http;
 
 namespace LogSample.Model.Service
 {
@@ -18,41 +23,80 @@ namespace LogSample.Model.Service
     {
         private string ElasticUrl { get; set; }
         private HttpClient Client { get; set; }
+
         private IHttpContextAccessor httpContext { get; set; }
         private ElasticClient elasticsearchClient { get; set; }
+
+        private readonly string collectionName = typeof(T).Name.ToLower();
+        private AsyncRetryPolicy<HttpResponseMessage> Policy { get; set; }
         public ElasticService(IConfiguration config, IHttpContextAccessor httpContextAccessor)
         {
             if (Client == null)
                 Client = new HttpClient();
             ElasticUrl = config.GetSection("Elastic").Value;
-            Client.BaseAddress = new Uri(ElasticUrl);
+
+
+            Client.BaseAddress = new Uri(config.GetSection("Elastic").Value);
             httpContext = httpContextAccessor;
 
 
-            var node = new Uri(ElasticUrl);
+            var node = new Uri(config.GetSection("Elastic").Value);
             var settings = new ConnectionSettings(node);
+            settings.DefaultIndex(collectionName);
             elasticsearchClient = new ElasticClient(settings);
+            HttpStatusCode[] httpStatusCodesWorthRetrying = {
+                       HttpStatusCode.RequestTimeout, // 408
+                       HttpStatusCode.InternalServerError, // 500
+                       HttpStatusCode.BadGateway, // 502
+                       HttpStatusCode.ServiceUnavailable, // 503
+                       HttpStatusCode.GatewayTimeout // 504
+                    };
+
+            Policy = Polly.Policy.HandleResult<HttpResponseMessage>(r => httpStatusCodesWorthRetrying.Contains(r.StatusCode))
+                                                .WaitAndRetryAsync(new[]
+                                  {
+                                    TimeSpan.FromSeconds(1),
+                                    TimeSpan.FromSeconds(2),
+                                    TimeSpan.FromSeconds(3)
+                                  }, (exception, timeSpan, context) =>
+                                  {
+                                      Debug.WriteLine("-------------------------------------- exception------------------------------------------");
+                                      Debug.WriteLine(exception);
+                                      Debug.WriteLine("-------------------------------------- timeSpan ------------------------------------------");
+                                      Debug.WriteLine(timeSpan);
+                                      Debug.WriteLine("-------------------------------------- context  ------------------------------------------");
+                                      Debug.WriteLine(context);
+                                  });
+
+
 
         }
         public async Task<LogModel<T>> GetById(string objectName, object id)
         {
-            var result = await Client.GetAsync($"{objectName.ToLower()}/_doc/{id}");
-            if (result.IsSuccessStatusCode)
+            LogModel<T> result = null;
+            var response = await Policy.ExecuteAsync(() => ElasticUrl.AllowAnyHttpStatus()
+                                                            .AppendPathSegment($"{objectName.ToLower()}/_doc/{id}")
+                                                            .GetAsync());
+
+            if (response.IsSuccessStatusCode)
             {
-                var temp = await result.Content.ReadAsStringAsync();
+                var temp = await response.Content.ReadAsStringAsync();
                 Debug.WriteLine(temp);
                 var data = JsonConvert.DeserializeObject<ElasticModel<LogModel<T>>>(temp);
 
-                return data._source;
+                result = data._source;
             }
-            return null;
+
+            return result;
         }
 
         public async Task<bool> Register(LogItem<T> log, string objectName, object id)
         {
-            var message = new HttpRequestMessage(HttpMethod.Post, $"{objectName.ToLower()}/_doc");
-            message.Content = new StringContent(JsonConvert.SerializeObject(log), Encoding.UTF8, "application/json");
-            var result = await Client.SendAsync(message);
+            //var message = new HttpRequestMessage(HttpMethod.Post, $"{objectName.ToLower()}/_doc");
+            //message.Content = new StringContent(JsonConvert.SerializeObject(log), Encoding.UTF8, "application/json");
+            var result = await Policy.ExecuteAsync(() => ElasticUrl.AllowAnyHttpStatus()
+                                                            .AppendPathSegment($"{objectName.ToLower()}/_doc")
+                                                            .PostJsonAsync(log));
 
             Debug.WriteLine(result.ReasonPhrase);
 
@@ -63,9 +107,11 @@ namespace LogSample.Model.Service
 
         public async Task<bool> Register(LogItem<T> log, string objectName)
         {
-            var message = new HttpRequestMessage(HttpMethod.Post, $"{objectName.ToLower()}/_doc");
-            message.Content = new StringContent(JsonConvert.SerializeObject(log), Encoding.UTF8, "application/json");
-            var result = await Client.SendAsync(message);
+            //var message = new HttpRequestMessage(HttpMethod.Post, $"{objectName.ToLower()}/_doc");
+            //message.Content = new StringContent(JsonConvert.SerializeObject(log), Encoding.UTF8, "application/json");
+            var result = await Policy.ExecuteAsync(() => ElasticUrl.AllowAnyHttpStatus()
+                                                            .AppendPathSegment($"{objectName.ToLower()}/_doc")
+                                                            .PostJsonAsync(log));
 
             Debug.WriteLine(result.ReasonPhrase);
 
@@ -91,9 +137,11 @@ namespace LogSample.Model.Service
                 item.History.Add(log);
             }
 
-            var message = new HttpRequestMessage(HttpMethod.Put, $"{objectName.ToLower()}/_doc/{id}");
-            message.Content = new StringContent(JsonConvert.SerializeObject(item), Encoding.UTF8, "application/json");
-            var result = await Client.SendAsync(message);
+            //var message = new HttpRequestMessage(HttpMethod.Put, $"{objectName.ToLower()}/_doc/{id}");
+            //message.Content = new StringContent(JsonConvert.SerializeObject(item), Encoding.UTF8, "application/json");
+            var result = await Policy.ExecuteAsync(() => ElasticUrl.AllowAnyHttpStatus()
+                                                            .AppendPathSegment($"{objectName.ToLower()}/_doc/{id}")
+                                                            .PutJsonAsync(log));
 
             Debug.WriteLine(result.ReasonPhrase);
 
@@ -104,14 +152,14 @@ namespace LogSample.Model.Service
 
         public async Task<bool> RegisterNest(LogItem<T> log, string objectName)
         {
-            var result = await elasticsearchClient.IndexAsync(log, idx => idx.Index(objectName));
+            var result = await elasticsearchClient.IndexAsync(log, idx => idx.Index(collectionName));
 
             return result.IsValid;
         }
 
         public async Task<bool> RegisterNest(LogItem<T> log, string objectName, object id)
         {
-            var result = await elasticsearchClient.IndexAsync(log, idx => idx.Index(objectName).Id(new Id(id)));
+            var result = await elasticsearchClient.IndexAsync(log, idx => idx.Index(collectionName).Id(new Id(id)));
 
             return result.IsValid;
         }
@@ -122,7 +170,7 @@ namespace LogSample.Model.Service
             log.Method = memberName;
             log.File = memberFile;
 
-            var item = await GetByIdNest(objectName, id);
+            var item = await GetByIdNest(collectionName, id);
             if (item != null)
             {
                 item.History.Add(log);
@@ -133,17 +181,33 @@ namespace LogSample.Model.Service
                 item.History.Add(log);
             }
 
-            var result = await elasticsearchClient.IndexAsync(log, idx => idx.Index(objectName));
+            var result = await elasticsearchClient.IndexAsync(log, idx => idx.Index(collectionName));
 
             return result.IsValid;
         }
 
         public async Task<LogModel<T>> GetByIdNest(string objectName, object id)
         {
-            var p = new DocumentPath<LogModel<T>>(new Id(id));
-            var response = await elasticsearchClient.GetAsync<LogModel<T>>(p, idx => idx.Index(objectName));
+            try
+            {
+                var p = new DocumentPath<LogModel<T>>(new Id(id));
 
-            return response.Source;
+                var response = await elasticsearchClient.SearchAsync<LogModel<T>>(s =>
+                                                                                    s.Size(1)
+                                                                                    .Query(q =>
+                                                                                        q.Match(m => m.Field(f => f.ObjectId)
+                                                                                                      .Query(id.ToString()
+                                                                                                      ))
+                                                                                        )
+                                                                                    );
+
+                return response.Documents.FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+                return null;
+            }
         }
     }
 }

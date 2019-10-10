@@ -37,7 +37,7 @@ namespace LogSample.Model.Service
                 var collection = mongoDatabase.GetCollection<LogModel<T>>(collectionName);
 
                 var builder = Builders<LogModel<T>>.Filter;
-                var filter = builder.Eq("ObjectId", $"{id}");
+                var filter = builder.Eq("ObjectId", $"{id.ToString()}");
 
                 var result = await collection.FindAsync(filter);
                 return await result.FirstOrDefaultAsync();
@@ -97,15 +97,26 @@ namespace LogSample.Model.Service
                 log.File = memberFile;
 
                 var logModel = await GetById(objectName, id);
-                if (logModel == null)
+                var exist = logModel != null;
+                if (!exist)
                     logModel = new LogModel<T>(log.User, log.OldData);
-                
-                
+
+
                 logModel.History.Add(log);
                 logModel.ObjectId = id.ToString();
 
                 var collection = mongoDatabase.GetCollection<LogModel<T>>(collectionName);
-                await collection.InsertOneAsync(logModel);
+                if (exist)
+                {
+                    var builder = Builders<LogModel<T>>.Filter;
+                    var filter = builder.Eq("ObjectId", $"{id}");
+                    var result = await collection.ReplaceOneAsync(filter, logModel);
+                    return result.ModifiedCount > 0;
+                }
+                else
+                {
+                    await collection.InsertOneAsync(logModel);
+                }
                 return true;
             }
             catch (Exception ex)
@@ -134,7 +145,7 @@ namespace LogSample.Model.Service
                 Debug.WriteLine("--------------------------------------------------------");
                 Debug.WriteLine("-------------------------Inner Exception message-------------------------------");
                 Debug.WriteLine(ex?.InnerException?.Message);
-               
+
                 return false;
             }
         }

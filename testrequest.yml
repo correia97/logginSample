@@ -18,6 +18,6 @@ config:
 scenarios:
   - flow:
     - get:
-        url: "https://localhost:44311/api/values"
+        url: "https://localhost:44311/api/values/elastichttp"
 
        
