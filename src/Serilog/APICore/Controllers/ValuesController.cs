@@ -19,17 +19,20 @@ namespace APICore.Controllers
         private IHttpContextAccessor _accessor;
         private IUserService _userService;
         private readonly IElasticService<UserModel> _eService;
+        private readonly IMongoService<UserModel> _mongoService;
 
         public ValuesController(ILogger<ValuesController> logger,
             IHttpContextAccessor accessor,
             IUserService userService,
-            IElasticService<UserModel> eService)
+            IElasticService<UserModel> eService,
+            IMongoService<UserModel> mongoService)
         {
 
             _logger = logger;
             _accessor = accessor;
             _userService = userService;
             _eService = eService;
+            _mongoService = mongoService;
         }
         // GET api/values
         [HttpGet]
@@ -50,20 +53,33 @@ namespace APICore.Controllers
             LogContext.PushProperty("AuditLog", true);
 
             await _eService.RegisterOrUpdate(logItem, logItem.ObjectName, logItem.ObjectId);
-            //_logger.Log(LogLevel.Warning, JsonConvert.SerializeObject(log));
 
+            await _mongoService.RegisterOrUpdate(logItem, logItem.ObjectName, logItem.ObjectId);
+            //_logger.Log(LogLevel.Warning, JsonConvert.SerializeObject(log));
 
             return Ok();
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        public async Task<ActionResult> Get(int id)
         {
-            var ip = _accessor.HttpContext.Connection.RemoteIpAddress.ToString();
-            var user = "user2@user.com";
-            _logger.Log(LogLevel.Warning, "get with param {0}, {1}, {3}", id, ip, user);
-            return "value";
+            var item = _userService.GetUser(Guid.Parse("53ffa492-5e18-4733-97f7-4255a322ef41"));
+
+            var logItem = new LogItem<UserModel>("CurrentUserName", ActionType.Update, item.Clone() as UserModel);
+            item.Email = "email2@email2.com";
+            item.lastName = "Silva Sauro";
+
+            _userService.Updateuser(item);
+            logItem.SetNewData(item);
+
+            LogContext.PushProperty("AuditLog", true);
+
+            await _eService.RegisterOrUpdateNest(logItem, logItem.ObjectName, logItem.ObjectId);
+            await _mongoService.RegisterOrUpdate(logItem, logItem.ObjectName, logItem.ObjectId);
+            //_logger.Log(LogLevel.Warning, JsonConvert.SerializeObject(log));
+
+            return Ok();
         }
 
         // POST api/values

@@ -27,6 +27,7 @@ namespace APICore
             .AddJsonFormatters();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped(typeof(IElasticService<>), typeof(ElasticService<>));
+            services.AddScoped(typeof(IMongoService<>), typeof(MongoService<>));
             services.AddScoped<IUserService, UserService>();
 
 

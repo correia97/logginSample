@@ -7,8 +7,10 @@ using System;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Nest;
 
 namespace LogSample.Model.Service
 {
@@ -17,6 +19,7 @@ namespace LogSample.Model.Service
         private string ElasticUrl { get; set; }
         private HttpClient Client { get; set; }
         private IHttpContextAccessor httpContext { get; set; }
+        private ElasticClient elasticsearchClient { get; set; }
         public ElasticService(IConfiguration config, IHttpContextAccessor httpContextAccessor)
         {
             if (Client == null)
@@ -24,6 +27,11 @@ namespace LogSample.Model.Service
             ElasticUrl = config.GetSection("Elastic").Value;
             Client.BaseAddress = new Uri(ElasticUrl);
             httpContext = httpContextAccessor;
+
+
+            var node = new Uri(ElasticUrl);
+            var settings = new ConnectionSettings(node);
+            elasticsearchClient = new ElasticClient(settings);
 
         }
         public async Task<LogModel<T>> GetById(string objectName, object id)
@@ -92,6 +100,50 @@ namespace LogSample.Model.Service
             Debug.WriteLine(await result.Content.ReadAsStringAsync());
 
             return result.IsSuccessStatusCode;
+        }
+
+        public async Task<bool> RegisterNest(LogItem<T> log, string objectName)
+        {
+            var result = await elasticsearchClient.IndexAsync(log, idx => idx.Index(objectName));
+
+            return result.IsValid;
+        }
+
+        public async Task<bool> RegisterNest(LogItem<T> log, string objectName, object id)
+        {
+            var result = await elasticsearchClient.IndexAsync(log, idx => idx.Index(objectName).Id(new Id(id)));
+
+            return result.IsValid;
+        }
+
+        public async Task<bool> RegisterOrUpdateNest(LogItem<T> log, string objectName, object id, [CallerMemberName] string memberName = "", [CallerFilePath] string memberFile = "")
+        {
+            log.Url = httpContext.HttpContext.Request.Path.Value;
+            log.Method = memberName;
+            log.File = memberFile;
+
+            var item = await GetByIdNest(objectName, id);
+            if (item != null)
+            {
+                item.History.Add(log);
+            }
+            else
+            {
+                item = new LogModel<T>(log.User, log.OldData);
+                item.History.Add(log);
+            }
+
+            var result = await elasticsearchClient.IndexAsync(log, idx => idx.Index(objectName));
+
+            return result.IsValid;
+        }
+
+        public async Task<LogModel<T>> GetByIdNest(string objectName, object id)
+        {
+            var p = new DocumentPath<LogModel<T>>(new Id(id));
+            var response = await elasticsearchClient.GetAsync<LogModel<T>>(p, idx => idx.Index(objectName));
+
+            return response.Source;
         }
     }
 }

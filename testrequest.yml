@@ -1,0 +1,23 @@
+config:
+  target: 'https://localhost:44311/'
+  tls:
+    rejectUnauthorized: false
+  phases:
+    - duration: 10
+      name: "start"
+      arrivalRate: 5
+    - duration: 20
+      name: "fase 1"
+      arrivalRate: 50
+    - duration: 20
+      name: "fase 2"
+      arrivalRate: 100  
+    - duration: 20
+      name: "fase 3"
+      arrivalRate: 200            
+scenarios:
+  - flow:
+    - get:
+        url: "https://localhost:44311/api/values"
+
+       
