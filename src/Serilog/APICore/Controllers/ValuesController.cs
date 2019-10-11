@@ -51,9 +51,9 @@ namespace APICore.Controllers
 
             LogContext.PushProperty("AuditLog", true);
 
-            await _eService.RegisterOrUpdate(logItem, logItem.ObjectName, logItem.ObjectId);
+            await _eService.RegisterOrUpdate(logItem,  logItem.ObjectId);
 
-            await _mongoService.RegisterOrUpdate(logItem, logItem.ObjectName, logItem.ObjectId);
+            await _mongoService.RegisterOrUpdate(logItem,  logItem.ObjectId);
             //_logger.Log(LogLevel.Warning, JsonConvert.SerializeObject(log));
 
             return Ok();
@@ -74,8 +74,8 @@ namespace APICore.Controllers
 
             LogContext.PushProperty("AuditLog", true);
 
-            await _eService.RegisterOrUpdateNest(logItem, logItem.ObjectName, logItem.ObjectId);
-            await _mongoService.RegisterOrUpdate(logItem, logItem.ObjectName, logItem.ObjectId);
+            await _eService.RegisterOrUpdateNest(logItem,  logItem.ObjectId);
+            await _mongoService.RegisterOrUpdate(logItem,  logItem.ObjectId);
             //_logger.Log(LogLevel.Warning, JsonConvert.SerializeObject(log));
 
             return Ok();
@@ -97,8 +97,8 @@ namespace APICore.Controllers
 
             LogContext.PushProperty("AuditLog", true);
 
-            //await _eService.RegisterOrUpdateNest(logItem, logItem.ObjectName, logItem.ObjectId);
-            await _mongoService.RegisterOrUpdate(logItem, logItem.ObjectName, logItem.ObjectId);
+            //await _eService.RegisterOrUpdateNest(logItem,  logItem.ObjectId);
+            await _mongoService.RegisterOrUpdate(logItem,  logItem.ObjectId);
             //_logger.Log(LogLevel.Warning, JsonConvert.SerializeObject(log));
 
             return Ok();
@@ -119,8 +119,8 @@ namespace APICore.Controllers
 
             LogContext.PushProperty("AuditLog", true);
 
-            await _eService.RegisterOrUpdate(logItem, logItem.ObjectName, logItem.ObjectId);
-            // await _mongoService.RegisterOrUpdate(logItem, logItem.ObjectName, logItem.ObjectId);
+            await _eService.RegisterOrUpdate(logItem,  logItem.ObjectId);
+            // await _mongoService.RegisterOrUpdate(logItem,  logItem.ObjectId);
             //_logger.Log(LogLevel.Warning, JsonConvert.SerializeObject(log));
 
             return Ok();
@@ -141,8 +141,8 @@ namespace APICore.Controllers
 
             LogContext.PushProperty("AuditLog", true);
 
-            await _eService.RegisterOrUpdateNest(logItem, logItem.ObjectName, logItem.ObjectId);
-            // await _mongoService.RegisterOrUpdate(logItem, logItem.ObjectName, logItem.ObjectId);
+            await _eService.RegisterOrUpdateNest(logItem,  logItem.ObjectId);
+            // await _mongoService.RegisterOrUpdate(logItem,  logItem.ObjectId);
             //_logger.Log(LogLevel.Warning, JsonConvert.SerializeObject(log));
 
             return Ok();

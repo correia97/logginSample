@@ -30,7 +30,7 @@ namespace LogSample.Model.Service
         }
 
 
-        public async Task<LogModel<T>> GetById(string objectName, object id)
+        public async Task<LogModel<T>> GetById(object id)
         {
             try
             {
@@ -49,7 +49,7 @@ namespace LogSample.Model.Service
             }
         }
 
-        public async Task<bool> Register(LogItem<T> log, string objectName)
+        public async Task<bool> Register(LogItem<T> log)
         {
             try
             {
@@ -68,7 +68,7 @@ namespace LogSample.Model.Service
             }
         }
 
-        public async Task<bool> Register(LogItem<T> log, string objectName, object id)
+        public async Task<bool> Register(LogItem<T> log, object id)
         {
             try
             {
@@ -88,7 +88,7 @@ namespace LogSample.Model.Service
             }
         }
 
-        public async Task<bool> RegisterOrUpdate(LogItem<T> log, string objectName, object id, [CallerMemberName] string memberName = "", [CallerFilePath] string memberFile = "")
+        public async Task<bool> RegisterOrUpdate(LogItem<T> log, object id, [CallerMemberName] string memberName = "", [CallerFilePath] string memberFile = "")
         {
             try
             {
@@ -96,7 +96,7 @@ namespace LogSample.Model.Service
                 log.Method = memberName;
                 log.File = memberFile;
 
-                var logModel = await GetById(objectName, id);
+                var logModel = await GetById( id);
                 var exist = logModel != null;
                 if (!exist)
                     logModel = new LogModel<T>(log.User, log.OldData);

@@ -60,22 +60,22 @@ namespace LogSample.Model.Service
                                     TimeSpan.FromSeconds(3)
                                   }, (exception, timeSpan, context) =>
                                   {
-                                      Debug.WriteLine("-------------------------------------- exception------------------------------------------");
+                                      Debug.WriteLine("-------------------------------------- exception ------------------------------------------");
                                       Debug.WriteLine(exception);
-                                      Debug.WriteLine("-------------------------------------- timeSpan ------------------------------------------");
+                                      Debug.WriteLine("-------------------------------------- timeSpan  ------------------------------------------");
                                       Debug.WriteLine(timeSpan);
-                                      Debug.WriteLine("-------------------------------------- context  ------------------------------------------");
+                                      Debug.WriteLine("-------------------------------------- context   ------------------------------------------");
                                       Debug.WriteLine(context);
                                   });
 
 
 
         }
-        public async Task<LogModel<T>> GetById(string objectName, object id)
+        public async Task<LogModel<T>> GetById( object id)
         {
             LogModel<T> result = null;
             var response = await Policy.ExecuteAsync(() => ElasticUrl.AllowAnyHttpStatus()
-                                                            .AppendPathSegment($"{objectName.ToLower()}/_doc/{id}")
+                                                            .AppendPathSegment($"{collectionName}/_doc/{id}")
                                                             .GetAsync());
 
             if (response.IsSuccessStatusCode)
@@ -90,12 +90,12 @@ namespace LogSample.Model.Service
             return result;
         }
 
-        public async Task<bool> Register(LogItem<T> log, string objectName, object id)
+        public async Task<bool> Register(LogItem<T> log, object id)
         {
             //var message = new HttpRequestMessage(HttpMethod.Post, $"{objectName.ToLower()}/_doc");
             //message.Content = new StringContent(JsonConvert.SerializeObject(log), Encoding.UTF8, "application/json");
             var result = await Policy.ExecuteAsync(() => ElasticUrl.AllowAnyHttpStatus()
-                                                            .AppendPathSegment($"{objectName.ToLower()}/_doc")
+                                                            .AppendPathSegment($"{collectionName}/_doc")
                                                             .PostJsonAsync(log));
 
             Debug.WriteLine(result.ReasonPhrase);
@@ -105,12 +105,12 @@ namespace LogSample.Model.Service
             return result.IsSuccessStatusCode;
         }
 
-        public async Task<bool> Register(LogItem<T> log, string objectName)
+        public async Task<bool> Register(LogItem<T> log)
         {
             //var message = new HttpRequestMessage(HttpMethod.Post, $"{objectName.ToLower()}/_doc");
             //message.Content = new StringContent(JsonConvert.SerializeObject(log), Encoding.UTF8, "application/json");
             var result = await Policy.ExecuteAsync(() => ElasticUrl.AllowAnyHttpStatus()
-                                                            .AppendPathSegment($"{objectName.ToLower()}/_doc")
+                                                            .AppendPathSegment($"{collectionName}/_doc")
                                                             .PostJsonAsync(log));
 
             Debug.WriteLine(result.ReasonPhrase);
@@ -120,13 +120,13 @@ namespace LogSample.Model.Service
             return result.IsSuccessStatusCode;
         }
 
-        public async Task<bool> RegisterOrUpdate(LogItem<T> log, string objectName, object id, string memberName, string memberFile)
+        public async Task<bool> RegisterOrUpdate(LogItem<T> log, object id, string memberName, string memberFile)
         {
             log.Url = httpContext.HttpContext.Request.Path.Value;
             log.Method = memberName;
             log.File = memberFile;
 
-            var item = await GetById(objectName, id);
+            var item = await GetById(id);
             if (item != null)
             {
                 item.History.Add(log);
@@ -140,7 +140,7 @@ namespace LogSample.Model.Service
             //var message = new HttpRequestMessage(HttpMethod.Put, $"{objectName.ToLower()}/_doc/{id}");
             //message.Content = new StringContent(JsonConvert.SerializeObject(item), Encoding.UTF8, "application/json");
             var result = await Policy.ExecuteAsync(() => ElasticUrl.AllowAnyHttpStatus()
-                                                            .AppendPathSegment($"{objectName.ToLower()}/_doc/{id}")
+                                                            .AppendPathSegment($"{collectionName}/_doc/{id}")
                                                             .PutJsonAsync(log));
 
             Debug.WriteLine(result.ReasonPhrase);
@@ -150,27 +150,27 @@ namespace LogSample.Model.Service
             return result.IsSuccessStatusCode;
         }
 
-        public async Task<bool> RegisterNest(LogItem<T> log, string objectName)
+        public async Task<bool> RegisterNest(LogItem<T> log)
         {
             var result = await elasticsearchClient.IndexAsync(log, idx => idx.Index(collectionName));
 
             return result.IsValid;
         }
 
-        public async Task<bool> RegisterNest(LogItem<T> log, string objectName, object id)
+        public async Task<bool> RegisterNest(LogItem<T> log, object id)
         {
             var result = await elasticsearchClient.IndexAsync(log, idx => idx.Index(collectionName).Id(new Id(id)));
 
             return result.IsValid;
         }
 
-        public async Task<bool> RegisterOrUpdateNest(LogItem<T> log, string objectName, object id, [CallerMemberName] string memberName = "", [CallerFilePath] string memberFile = "")
+        public async Task<bool> RegisterOrUpdateNest(LogItem<T> log, object id, [CallerMemberName] string memberName = "", [CallerFilePath] string memberFile = "")
         {
             log.Url = httpContext.HttpContext.Request.Path.Value;
             log.Method = memberName;
             log.File = memberFile;
 
-            var item = await GetByIdNest(collectionName, id);
+            var item = await GetByIdNest( id);
             if (item != null)
             {
                 item.History.Add(log);
@@ -186,7 +186,7 @@ namespace LogSample.Model.Service
             return result.IsValid;
         }
 
-        public async Task<LogModel<T>> GetByIdNest(string objectName, object id)
+        public async Task<LogModel<T>> GetByIdNest( object id)
         {
             try
             {
