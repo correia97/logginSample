@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: 
+      - master
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - uses: docker://mcr.microsoft.com/dotnet/core/sdk:2.2
+    - name: Restore packge
+      run: dotnet restore
+    - name: Buld
+      run: dotnet build
+      
+    
+  test:
+    needs: build
+    steps:
+    - name: Run Tests
+      run: dotnet test
+   
