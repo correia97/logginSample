@@ -1,4 +1,4 @@
-name: CI
+name: BulidGit
 
 on:
   push:
@@ -17,11 +17,6 @@ jobs:
       run: dotnet restore
     - name: Buld
       run: dotnet build
-      
-    
-  test:
-    needs: build
-    steps:
     - name: Run Tests
       run: dotnet test
    
