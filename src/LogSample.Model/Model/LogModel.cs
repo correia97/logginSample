@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace LogSample.Model
 {
-    public class LogModel<T> where T : class
+    public class LogModel<T> where T : class, ICloneable
     {
         public LogModel()
         {

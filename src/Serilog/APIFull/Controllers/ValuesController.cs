@@ -4,7 +4,6 @@ using LogSample.Model.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Serilog.Context;
 using System;
 using System.Threading.Tasks;
@@ -42,7 +41,7 @@ namespace APIFull.Controllers
             var item = _userService.GetUser(Guid.NewGuid());
 
 
-            var logItem = new LogItem<UserModel>("CurrentUserName", ActionType.Update, item.Clone() as UserModel);
+            var logItem = new LogItem<UserModel>("CurrentUserName", ActionType.Update, item);
             item.Email = "email2@email2.com";
             item.lastName = "Silva Sauro";
 
@@ -66,7 +65,7 @@ namespace APIFull.Controllers
         {
             var item = _userService.GetUser(Guid.NewGuid());
 
-            var logItem = new LogItem<UserModel>("CurrentUserName", ActionType.Update, item.Clone() as UserModel);
+            var logItem = new LogItem<UserModel>("CurrentUserName", ActionType.Update, item);
             item.Email = "email2@email2.com";
             item.lastName = "Silva Sauro";
 
@@ -89,7 +88,7 @@ namespace APIFull.Controllers
         {
             var item = _userService.GetUser(Guid.NewGuid());
 
-            var logItem = new LogItem<UserModel>("CurrentUserName", ActionType.Update, item.Clone() as UserModel);
+            var logItem = new LogItem<UserModel>("CurrentUserName", ActionType.Update, item);
             item.Email = "email2@email2.com";
             item.lastName = "Silva Sauro";
 
@@ -111,7 +110,7 @@ namespace APIFull.Controllers
         {
             var item = _userService.GetUser(Guid.NewGuid());
 
-            var logItem = new LogItem<UserModel>("CurrentUserName", ActionType.Update, item.Clone() as UserModel);
+            var logItem = new LogItem<UserModel>("CurrentUserName", ActionType.Update, item);
             item.Email = "email2@email2.com";
             item.lastName = "Silva Sauro";
 
@@ -133,7 +132,7 @@ namespace APIFull.Controllers
         {
             var item = _userService.GetUser(Guid.NewGuid());
 
-            var logItem = new LogItem<UserModel>("CurrentUserName", ActionType.Update, item.Clone() as UserModel);
+            var logItem = new LogItem<UserModel>("CurrentUserName", ActionType.Update, item);
             item.Email = "email2@email2.com";
             item.lastName = "Silva Sauro";
 

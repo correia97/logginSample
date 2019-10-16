@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace LogSample.Model.Service
 {
-    public class MongoService<T> : IMongoService<T> where T : class
+    public class MongoService<T> : IMongoService<T> where T : class, ICloneable
     {
         private string MongoConnection { get; set; }
         private string MongoBase { get; set; }

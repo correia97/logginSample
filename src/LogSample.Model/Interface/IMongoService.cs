@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace LogSample.Model.Interface
 {
-    public interface IMongoService<T> where T : class
+    public interface IMongoService<T> where T : class, ICloneable
     {
         Task<bool> Register(LogItem<T> log);
         Task<bool> Register(LogItem<T> log, object id);

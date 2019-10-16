@@ -4,7 +4,7 @@ using System;
 
 namespace LogSample.Model
 {
-    public class LogItem<T> where T : class
+    public class LogItem<T> where T : class, ICloneable
     {
         protected LogItem()
         {
@@ -14,7 +14,7 @@ namespace LogSample.Model
             CreateDate = DateTime.Now;
             User = user;
             ActionType = actionType;
-            OldData = data;
+            OldData = (T)data.Clone();
         }
         public DateTime CreateDate { get; set; }
         public T OldData { get; set; }
