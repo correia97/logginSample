@@ -17,14 +17,14 @@ namespace APIFull.Controllers
         readonly ILogger<ValuesController> _logger;
         private IHttpContextAccessor _accessor;
         private IUserService _userService;
-        private readonly IElasticService<UserModel> _eService;
-        private readonly IMongoService<UserModel> _mongoService;
+        private readonly IElasticService _eService;
+        private readonly IMongoService _mongoService;
 
         public ValuesController(ILogger<ValuesController> logger,
             IHttpContextAccessor accessor,
             IUserService userService,
-            IElasticService<UserModel> eService,
-            IMongoService<UserModel> mongoService)
+            IElasticService eService,
+            IMongoService mongoService)
         {
 
             _logger = logger;
@@ -41,7 +41,7 @@ namespace APIFull.Controllers
             var item = _userService.GetUser(Guid.NewGuid());
 
 
-            var logItem = new LogItem<UserModel>("CurrentUserName", ActionType.Update, item);
+            var logItem = new LogItem<UserModel>( ActionType.Update, item);
             item.Email = "email2@email2.com";
             item.lastName = "Silva Sauro";
 
@@ -65,7 +65,7 @@ namespace APIFull.Controllers
         {
             var item = _userService.GetUser(Guid.NewGuid());
 
-            var logItem = new LogItem<UserModel>("CurrentUserName", ActionType.Update, item);
+            var logItem = new LogItem<UserModel>( ActionType.Update, item);
             item.Email = "email2@email2.com";
             item.lastName = "Silva Sauro";
 
@@ -88,7 +88,7 @@ namespace APIFull.Controllers
         {
             var item = _userService.GetUser(Guid.NewGuid());
 
-            var logItem = new LogItem<UserModel>("CurrentUserName", ActionType.Update, item);
+            var logItem = new LogItem<UserModel>( ActionType.Update, item);
             item.Email = "email2@email2.com";
             item.lastName = "Silva Sauro";
 
@@ -110,7 +110,7 @@ namespace APIFull.Controllers
         {
             var item = _userService.GetUser(Guid.NewGuid());
 
-            var logItem = new LogItem<UserModel>("CurrentUserName", ActionType.Update, item);
+            var logItem = new LogItem<UserModel>( ActionType.Update, item);
             item.Email = "email2@email2.com";
             item.lastName = "Silva Sauro";
 
@@ -132,7 +132,7 @@ namespace APIFull.Controllers
         {
             var item = _userService.GetUser(Guid.NewGuid());
 
-            var logItem = new LogItem<UserModel>("CurrentUserName", ActionType.Update, item);
+            var logItem = new LogItem<UserModel>( ActionType.Update, item);
             item.Email = "email2@email2.com";
             item.lastName = "Silva Sauro";
 

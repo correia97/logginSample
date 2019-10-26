@@ -27,8 +27,8 @@ namespace APIFull
            .AddAuthorization()
            .AddJsonFormatters();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddScoped(typeof(IElasticService<>), typeof(ElasticService<>));
-            services.AddScoped(typeof(IMongoService<>), typeof(MongoService<>));
+            services.AddScoped<IElasticService, ElasticService>();
+            services.AddScoped<IMongoService, MongoService>();
             services.AddScoped<IUserService, UserService>();
 
 

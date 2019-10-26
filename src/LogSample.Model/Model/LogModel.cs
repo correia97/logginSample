@@ -9,7 +9,6 @@ namespace LogSample.Model
         public LogModel()
         {
             History = new List<LogItem<T>>();
-            Id = Guid.NewGuid();
         }
         public LogModel(string user, T currentData)
         {
@@ -17,10 +16,8 @@ namespace LogSample.Model
             CreateDate = DateTime.Now;
             User = user;
             ObjectId = GetId(currentData);
-            Id = Guid.NewGuid();
         }
-        [BsonId]
-        public Guid Id { get;  set; }
+
         public DateTime CreateDate { get; set; }
         public string User { get; set; }
 

@@ -1,6 +1,9 @@
 ﻿using LogSample.Model.Enum;
+using LogSample.Model.Extensions;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace LogSample.Model
 {
@@ -9,12 +12,28 @@ namespace LogSample.Model
         protected LogItem()
         {
         }
-        public LogItem(string user, ActionType actionType, T data)
+        public LogItem(ActionType actionType, T data)
         {
             CreateDate = DateTime.Now;
-            User = user;
             ActionType = actionType;
-            OldData = (T)data.Clone();
+            if (data != null)
+                OldData = (T)data.Clone();
+        }
+
+        public LogItem(ActionType actionType, IEnumerable<T> data)
+        {
+            CreateDate = DateTime.Now;
+            ActionType = actionType;
+            if (data != null)
+                OldData = (T)data.Clone();
+        }
+
+        public LogItem(ActionType actionType, IList<T> data)
+        {
+            CreateDate = DateTime.Now;
+            ActionType = actionType;
+            if (data != null)
+                OldData = (T)data.Clone();
         }
         public DateTime CreateDate { get; set; }
         public T OldData { get; set; }
@@ -33,20 +52,48 @@ namespace LogSample.Model
             {
                 if (OldData == null)
                     return null;
+
+
+                if ((OldData is IList || OldData is IEnumerable) && OldData.GetType().IsGenericType)
+                {
+                    return null;
+                }
+
                 var item = typeof(T).GetProperty("Id");
                 return item.GetValue(OldData);
             }
         }
         public void SetNewData(T data)
         {
-            NewData = data;
+            NewData = (T)data.Clone();
 
         }
 
         public void SetOldData(T data)
         {
-            OldData = data;
+            OldData = (T)data.Clone();
         }
 
+        public void SetNewData(IList<T> data)
+        {
+            NewData = (T)data.Clone();
+        }
+
+        public void SetOldData(IList<T> data)
+        {
+            OldData = (T)data.Clone();
+        }
+
+        public void SetNewData(IEnumerable<T> data)
+        {
+            NewData = (T)data.Clone();
+
+        }
+
+        public void SetOldData(IEnumerable<T> data)
+        {
+            OldData = (T)data.Clone();
+        }
     }
+
 }

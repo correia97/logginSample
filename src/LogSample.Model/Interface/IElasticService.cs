@@ -4,18 +4,16 @@ using System.Threading.Tasks;
 
 namespace LogSample.Model.Interface
 {
-    public interface IElasticService<T> where T : class, ICloneable
+    public interface IElasticService
     {
-        Task<bool> Register(LogItem<T> item);
-        Task<bool> Register(LogItem<T> item, object id);
-        Task<bool> RegisterOrUpdate(LogItem<T> item, object id, [System.Runtime.CompilerServices.CallerMemberName] string memberName = "", [System.Runtime.CompilerServices.CallerFilePath] string memberFile = "");
-        Task<LogModel<T>> GetById(object id);
+        Task<bool> RegisterOrUpdate<T>(LogItem<T> item, object id, [System.Runtime.CompilerServices.CallerMemberName] string memberName = "", [System.Runtime.CompilerServices.CallerFilePath] string memberFile = "") where T : class, ICloneable;
+        Task<LogModel<T>> GetById<T>(object id) where T : class, ICloneable;
 
 
 
-        Task<bool> RegisterNest(LogItem<T> item);
-        Task<bool> RegisterNest(LogItem<T> item, object id);
-        Task<bool> RegisterOrUpdateNest(LogItem<T> item, object id, [System.Runtime.CompilerServices.CallerMemberName] string memberName = "", [System.Runtime.CompilerServices.CallerFilePath] string memberFile = "");
-        Task<LogModel<T>> GetByIdNest(object id);
+        Task<bool> RegisterNest<T>(LogItem<T> item) where T : class, ICloneable;
+        Task<bool> RegisterNest<T>(LogItem<T> item, object id) where T : class, ICloneable;
+        Task<bool> RegisterOrUpdateNest<T>(LogItem<T> item, object id, [System.Runtime.CompilerServices.CallerMemberName] string memberName = "", [System.Runtime.CompilerServices.CallerFilePath] string memberFile = "") where T : class, ICloneable;
+        Task<LogModel<T>> GetByIdNest<T>(object id) where T : class, ICloneable;
     }
 }

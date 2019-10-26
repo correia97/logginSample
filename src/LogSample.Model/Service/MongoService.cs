@@ -9,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace LogSample.Model.Service
 {
-    public class MongoService<T> : IMongoService<T> where T : class, ICloneable
+    public class MongoService : IMongoService
     {
         private string MongoConnection { get; set; }
         private string MongoBase { get; set; }
         private IHttpContextAccessor httpContext { get; set; }
         private MongoClient Client { get; set; }
         private IMongoDatabase mongoDatabase { get; set; }
-        private readonly string collectionName = typeof(T).Name;
+        private string collectionName { get;  set; }
 
 
         public MongoService(IConfiguration config, IHttpContextAccessor httpContextAccessor)
@@ -30,10 +30,13 @@ namespace LogSample.Model.Service
         }
 
 
-        public async Task<LogModel<T>> GetById(object id)
+        public async Task<LogModel<T>> GetById<T>(object id) where T : class, ICloneable
         {
             try
             {
+                if (string.IsNullOrEmpty(collectionName))
+                    collectionName = typeof(T).Name.ToLower();
+
                 var collection = mongoDatabase.GetCollection<LogModel<T>>(collectionName);
 
                 var builder = Builders<LogModel<T>>.Filter;
@@ -49,10 +52,13 @@ namespace LogSample.Model.Service
             }
         }
 
-        public async Task<bool> Register(LogItem<T> log)
+        public async Task<bool> Register<T>(LogItem<T> log) where T : class, ICloneable
         {
             try
             {
+                if (string.IsNullOrEmpty(collectionName))
+                    collectionName = typeof(T).Name.ToLower();
+
                 log.Url = httpContext.HttpContext.Request.Path.Value;
 
                 var logModel = new LogModel<T>(log.User, log.OldData);
@@ -68,10 +74,13 @@ namespace LogSample.Model.Service
             }
         }
 
-        public async Task<bool> Register(LogItem<T> log, object id)
+        public async Task<bool> Register<T>(LogItem<T> log, object id) where T : class, ICloneable
         {
             try
             {
+                if (string.IsNullOrEmpty(collectionName))
+                    collectionName = typeof(T).Name.ToLower();
+
                 log.Url = httpContext.HttpContext.Request.Path.Value;
 
                 var logModel = new LogModel<T>(log.User, log.OldData);
@@ -88,15 +97,18 @@ namespace LogSample.Model.Service
             }
         }
 
-        public async Task<bool> RegisterOrUpdate(LogItem<T> log, object id, [CallerMemberName] string memberName = "", [CallerFilePath] string memberFile = "")
+        public async Task<bool> RegisterOrUpdate<T>(LogItem<T> log, object id, [CallerMemberName] string memberName = "", [CallerFilePath] string memberFile = "") where T : class, ICloneable
         {
             try
             {
+                if (string.IsNullOrEmpty(collectionName))
+                    collectionName = typeof(T).Name.ToLower();
+
                 log.Url = httpContext.HttpContext.Request.Path.Value;
                 log.Method = memberName;
                 log.File = memberFile;
 
-                var logModel = await GetById( id);
+                var logModel = await GetById<T>(id);
                 var exist = logModel != null;
                 if (!exist)
                     logModel = new LogModel<T>(log.User, log.OldData);
