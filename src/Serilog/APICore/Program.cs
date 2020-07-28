@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using MongoDB.Driver;
 using Serilog;
 using Serilog.Events;
@@ -55,7 +55,8 @@ namespace APICore
             try
             {
                 Log.Information("Starting API Core Serilog");
-                CreateWebHostBuilder(args).Build().Run();
+
+                CreateHostBuilder(args).Build().Run();
                 return;
             }
             catch (Exception ex)
@@ -69,10 +70,11 @@ namespace APICore
             }
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-
-             .UseSerilog();
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+              Host.CreateDefaultBuilder(args)
+                  .ConfigureWebHostDefaults(webBuilder =>
+                  {
+                      webBuilder.UseStartup<Startup>();
+                  });
     }
 }
