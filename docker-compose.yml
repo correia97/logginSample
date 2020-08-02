@@ -30,6 +30,21 @@ services:
       - logs
     depends_on: 
       - es01
+ 
+  mongo:
+    image: mongo:3.6
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: user
+      MONGO_INITDB_ROOT_PASSWORD: pwd123
+    ports: 
+      - 27017:27017
+    volumes:
+        - vmongo:/data/db
+    networks:
+      - logs
+    depends_on: 
+      - kibana
   # Api .net Core
   api:
     image: logapi
@@ -47,6 +62,8 @@ services:
 
 volumes:
   data01:
+    driver: local
+  vmongo:
     driver: local
   
 
