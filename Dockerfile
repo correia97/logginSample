@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-alpine3.11
+FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-alpine3.11 as base
 WORKDIR /APP
 
 FROM correia97/netcoresdksonar:3.1-alpine3.12 as build
@@ -15,6 +15,7 @@ COPY src/ .
 RUN dotnet build ./Serilog/APICore/APICore.csproj -c Release
 RUN dotnet publish ./Serilog/APICore/APICore.csproj -c Release -o out/
 
+FROM base as final
 COPY  --from=build ./APP/out .
 
 ENV ASPNETCORE_ENVIRONMENT=docker
