@@ -12,7 +12,7 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
-    - uses: docker://mcr.microsoft.com/dotnet/core/sdk:2.2
+    - uses: docker://mcr.microsoft.com/dotnet/core/sdk:3.1.302-buster
     - name: Updates
       run:  apt-get update &&  apt-get upgrade -y \
             apt-get install -y \
