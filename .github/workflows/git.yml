@@ -13,22 +13,6 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - uses: docker://mcr.microsoft.com/dotnet/core/sdk:3.1.302-buster
-    - name: Updates
-      run:  apt-get update &&  apt-get upgrade -y \
-            apt-get install -y \
-            openjdk-8-jdk 
-    - name: Config Java
-      run: update-alternatives --config java
-    - name: Export JAVA HOME
-      run: export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-    - name: Config JAVA HOME
-      run: JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
-    - name: Path JAVA HOME
-      run: PATH=${JAVA_HOME}/bin:$PATH 
-    - name: Install Sonar 
-      run: dotnet tool install --global dotnet-sonarscanner --version 4.7.1
-    - name: Path Global Tool
-      run: PATH="${PATH}:/root/.dotnet/tools"
     - name: Restore packge
       run: dotnet restore
     - name: Build
