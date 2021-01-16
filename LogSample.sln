@@ -11,12 +11,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APICore", "src\Serilog\APIC
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EDB6746C-1657-4B5D-81FE-E049FB117124}"
 	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+		Dockerfile = Dockerfile
 		readme.md = readme.md
+		testrequest.yml = testrequest.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LogSample.Model", "src\LogSample.Model\LogSample.Model.csproj", "{6664DF01-E275-4CC4-A79F-8013273E8D2D}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APIFull", "src\Serilog\APIFull\APIFull.csproj", "{9AB6109A-3DC8-43A7-83FE-67B8F3AA6C2C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,10 +33,6 @@ Global
 		{6664DF01-E275-4CC4-A79F-8013273E8D2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6664DF01-E275-4CC4-A79F-8013273E8D2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6664DF01-E275-4CC4-A79F-8013273E8D2D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9AB6109A-3DC8-43A7-83FE-67B8F3AA6C2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9AB6109A-3DC8-43A7-83FE-67B8F3AA6C2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9AB6109A-3DC8-43A7-83FE-67B8F3AA6C2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9AB6109A-3DC8-43A7-83FE-67B8F3AA6C2C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -44,7 +41,6 @@ Global
 		{241B9FB0-6A12-44E9-BD57-F10609AEAA28} = {9F56FD75-98DD-4BE6-93CB-05F526385CCC}
 		{9E834E58-BB92-4A77-9E36-C119265684A8} = {241B9FB0-6A12-44E9-BD57-F10609AEAA28}
 		{6664DF01-E275-4CC4-A79F-8013273E8D2D} = {9F56FD75-98DD-4BE6-93CB-05F526385CCC}
-		{9AB6109A-3DC8-43A7-83FE-67B8F3AA6C2C} = {241B9FB0-6A12-44E9-BD57-F10609AEAA28}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CA00C348-731E-4BB3-8B6C-0181E3E9A9D7}

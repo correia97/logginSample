@@ -1,0 +1,10 @@
+bin/
+*.dll
+obj/
+Dockerfile
+*-compose.yml
+*.md
+.github
+.vs/
+.gitignore
+*.user

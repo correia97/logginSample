@@ -3,12 +3,9 @@ using LogSample.Model.Service;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Swashbuckle.AspNetCore.Swagger;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using Swashbuckle.AspNetCore.SwaggerUI;
+using Microsoft.OpenApi.Models;
 
 namespace APICore
 {
@@ -24,10 +21,9 @@ namespace APICore
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddControllers();
             services.AddMvcCore()
-            .AddAuthorization()
-            .AddJsonFormatters();
+            .AddAuthorization();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<IElasticService,ElasticService>();
             services.AddScoped<IMongoService, MongoService>();
@@ -35,7 +31,7 @@ namespace APICore
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "My API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
             });
 
             //services.AddAuthentication("token")
@@ -52,7 +48,7 @@ namespace APICore
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseSwagger();
             app.UseSwaggerUI(c =>
@@ -61,7 +57,7 @@ namespace APICore
             });
 
             app.UseAuthentication();
-            if (env.IsDevelopment())
+            if (env.EnvironmentName.Contains("Develop"))
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -72,7 +68,16 @@ namespace APICore
             }
 
             app.UseHttpsRedirection();
-            app.UseMvc();
+         
+            app.UseRouting();
+
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
+
         }
     }
 }
